@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "Transform2D.h"
 #include "Scene.h"
+#include "Testscene.h"
 
 bool Engine::m_applicationShouldClose = false;
 Scene** Engine::m_scenes = new Scene*;
@@ -28,7 +29,7 @@ void Engine::start()
 	SetTargetFPS(0);
 
 	//Start the scene
-	m_currentSceneIndex = addScene(new Scene());
+	m_currentSceneIndex = addScene(new Testscene());
 	m_scenes[m_currentSceneIndex]->start();
 }
 
@@ -103,22 +104,28 @@ int Engine::getCurrentSceneIndex()
 int Engine::addScene(Scene* scene)
 {
 	//If the scene is null then return before running any other logic
-
+	if (scene == nullptr)
+	{
+		return false;
+	}
 	//Create a new array with a size one greater than our old array
+	Scene** temp = new Scene * [m_sceneCount + 1];
 
 	//Copy the values from the old array to the new array
-
+	for (int i = 0; i < m_sceneCount; i++)
+	{
+		temp[i] = m_scenes[i];
+	}
 	//Store the current index
-
+	int index = m_sceneCount;
 	//Set the last value in the new array to be the scene we want to add
-
-	//Sets the scene at the new index to be the scene passed in
-
+	temp[index] = scene;
 	//Set old array to hold the values of the new array
-
+	m_scenes = temp;
 	//Increase the scene count by one
-
+	m_sceneCount++;
 	//Return the index this scene is at
+	return index;
 }
 
 void Engine::addActorToDeletionList(Actor* actor)
@@ -140,22 +147,40 @@ void Engine::addActorToDeletionList(Actor* actor)
 bool Engine::removeScene(Scene* scene)
 {
 	//Exit the function if the scene was null
-
+	if (!scene)
+	{
+		return false;
+	}
 	//Create variable to store if the scene was removed
-
+	bool sceneRemoved = false;
 	//Create a new temporary array with a size one less than our old array
-
+	Scene** temp = new Scene * [m_sceneCount - 1];
 	//Create variable to access temporary array index
-
+	int j = 0;
 	//Copy values from the old array to the new array except the scene to delete
-		//If the actor to delete was skipped, set the scene removed variable to true.
-
+		//If the scene to delete was skipped, set the scene removed variable to true.
+	for (int i = 0; i < m_sceneCount; i++)
+	{
+		if (m_scenes[i] == scene)
+		{
+			sceneRemoved = true;
+			continue;
+		}
+		temp[j] = m_scenes[i];
+		j++;
+	}
 
 	//Set the old array to the new array and decrease the scene count if the actor was removed
+	if (sceneRemoved)
+	{
+		delete[] m_scenes;
+		m_scenes = temp;
+		m_sceneCount++;
+	}
 
-	//Delete the temporary array
 
 	//Return whether or not the removal was successful
+	return sceneRemoved;
 }
 
 void Engine::setCurrentScene(int index)
