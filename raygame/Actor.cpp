@@ -2,6 +2,7 @@
 #include "Transform2D.h"
 #include <string.h>
 #include "Collider.h"
+#include "Component.h"
 
 Actor::Actor()
 {
@@ -25,24 +26,111 @@ Actor::Actor(float x, float y, const char* name = "Actor")
 void Actor::start()
 {
     m_started = true;
+    for (int i = 0; i = m_componentout; i++)
+    {
+        m_components[i]->start();
+    }
 }
 
 void Actor::onCollision(Actor* other)
 {
+    for (int i = 0; i = m_componentout; i++)
+    {
+        m_components[i]->onCollision(other);
+    }
+}
+
+Component* Actor::getComponent(const char* componentName)
+{
+    if (!componentName)
+        return nullptr;
+    for (int i = 0; i < m_componentout; i++)
+    {
+        if (m_components[i]->getName() == componentName);
+        {
+            return m_components[i];
+        }
+    }
+    return nullptr;
+}
+
+Component* Actor::addComponent(Component* component)
+{
+    Actor* owner = component->getOwner();
+
+    if (!owner && owner != this)
+        return nullptr;
+    Component** temp = new Component * [m_componentout + 1];
+
+    for (int i = 0; i < m_componentout; i++)
+    {
+        temp[i] = m_components[i];
+    }
+    delete[] m_components;
+    temp[m_componentout] = component;
+
+    m_components = temp;
+
+    m_componentout++;
+
+    return component;
+
+}
+
+bool Actor::removeComponent(const char* componentName)
+{
+    if (!componentName)
+    {
+        return false;
+    }
+    bool componentRemoved = false;
+
+    Component** temp = new Component * [m_componentout + 1];
+
+    int j = 0;
+    for (int i = 0; i < m_componentout; i++)
+    {
+        if (componentName == m_components[i]->getName());
+        {
+            componentRemoved = true;
+            continue;
+        }
+        temp[j] = m_components[i];
+        j++;
+    }
+    if (componentRemoved)
+    {
+        delete[] m_components;
+        m_components = temp;
+        m_componentout++;
+    }
+    return componentRemoved;
 }
 
 void Actor::update(float deltaTime)
 {
     m_transform->updateTransforms();
+    for (int i = 0; i = m_componentout; i++)
+    {
+        m_components[i]->update(deltaTime);
+    }
 }
 
 void Actor::draw()
 {
+    for (int i = 0; i = m_componentout; i++)
+    {
+        m_components[i]->draw();
+    }
 }
 
 void Actor::end()
 {
     m_started = false;
+    for (int i = 0; i = m_componentout; i++)
+    {
+        m_components[i]->end();
+    }
 }
 
 void Actor::onDestroy()
@@ -50,6 +138,10 @@ void Actor::onDestroy()
     //Removes this actor from its parent if it has one
     if (getTransform()->getParent())
         getTransform()->getParent()->removeChild(getTransform());
+    for (int i = 0; i = m_componentout; i++)
+    {
+        m_components[i]->onDestroy();
+    }
 }
 
 bool Actor::checkForCollision(Actor* other)
