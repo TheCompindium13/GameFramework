@@ -26,7 +26,7 @@ Actor::Actor(float x, float y, const char* name = "Actor")
 void Actor::start()
 {
     m_started = true;
-    for (int i = 0; i = m_componentout; i++)
+    for (int i = 0; i >= m_componentout; i++)
     {
         m_components[i]->start();
     }
@@ -110,7 +110,7 @@ bool Actor::removeComponent(const char* componentName)
 void Actor::update(float deltaTime)
 {
     m_transform->updateTransforms();
-    for (int i = 0; i = m_componentout; i++)
+    for (int i = 0; i < m_componentout; i++)
     {
         m_components[i]->update(deltaTime);
     }
@@ -118,7 +118,7 @@ void Actor::update(float deltaTime)
 
 void Actor::draw()
 {
-    for (int i = 0; i = m_componentout; i++)
+    for (int i = 0; i < m_componentout; i++)
     {
         m_components[i]->draw();
     }
@@ -127,7 +127,7 @@ void Actor::draw()
 void Actor::end()
 {
     m_started = false;
-    for (int i = 0; i = m_componentout; i++)
+    for (int i = 0; i < m_componentout; i++)
     {
         m_components[i]->end();
     }
@@ -138,7 +138,7 @@ void Actor::onDestroy()
     //Removes this actor from its parent if it has one
     if (getTransform()->getParent())
         getTransform()->getParent()->removeChild(getTransform());
-    for (int i = 0; i = m_componentout; i++)
+    for (int i = 0; i < m_componentout; i++)
     {
         m_components[i]->onDestroy();
     }

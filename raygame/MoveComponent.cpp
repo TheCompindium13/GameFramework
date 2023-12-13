@@ -8,6 +8,7 @@ MoveComponent::MoveComponent(float maxspeed, Actor* owner) : Component(owner, "M
 void MoveComponent::update(float deltaTime)
 {
 	MathLibrary::Vector2 position = getOwner()->getTransform()->getLocalPosition();
+	setVelocity(MathLibrary::Vector2(25, 25));
 	if (getVelocity().getMagnitude() > getMaxSpeed())
 	{
 		MathLibrary::Vector2 newVelocity = getVelocity().getNormalized() * getMaxSpeed();
